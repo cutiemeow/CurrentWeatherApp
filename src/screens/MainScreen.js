@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet, ActivityIndicator } from 'react-native';
 import {listIMG} from '../img';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from "expo-location";
@@ -17,6 +17,7 @@ export default class MainScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+        loading: true,
         curWeather : {},
         temperatureC : '',
         description: '',
@@ -45,7 +46,8 @@ export default class MainScreen extends Component {
             icon,
             weatherMain,
             placeName,
-            time
+            time,
+            loading : false
         })
   }
   componentDidMount =  async () =>{
@@ -53,35 +55,43 @@ export default class MainScreen extends Component {
   }
 
   render() {
-    return (
-    <View style={styles.container}>
-        <View style={styles.content}>
-        <View style={styles.empty} ></View>
-            <View style = {styles.weather} >
-                <WeatherDescription
-                    weatherDescription = {this.state.description}
-                    weatherIcon = {this.state.icon}
-                    weatherMain = {this.state.weatherMain} >
-                </WeatherDescription>
-                <Temperature
-                    temperature = {this.state.temperatureC} >
-                </Temperature>
+      if(this.state.loading){
+          return (
+              <ActivityIndicator size = 'large' style = {{flex: 1}} />
+          );
+      }
+      else{
+        return (
+            <View style={styles.container}>
+                <View style={styles.content}>
+                <View style={styles.empty} ></View>
+                    <View style = {styles.weather} >
+                        <WeatherDescription
+                            weatherDescription = {this.state.description}
+                            weatherIcon = {this.state.icon}
+                            weatherMain = {this.state.weatherMain} >
+                        </WeatherDescription>
+                        <Temperature
+                            temperature = {this.state.temperatureC} >
+                        </Temperature>
+                    </View>
+                    <View style = {styles.place} >
+                        <Place
+                            placeName = {this.state.placeName}
+                            time = {this.state.time} >
+                        </Place>  
+                    </View>
+                    <View style={styles.empty} ></View>
+                    
+                </View>
+                <LinearGradient
+                    colors={['rgba(0,0,0,0.8)', 'transparent']}
+                    style = {styles.gradient} >
+                </LinearGradient>
             </View>
-            <View style = {styles.place} >
-                <Place
-                    placeName = {this.state.placeName}
-                    time = {this.state.time} >
-                </Place>  
-            </View>
-            <View style={styles.empty} ></View>
-            
-        </View>
-        <LinearGradient
-            colors={['rgba(0,0,0,0.8)', 'transparent']}
-            style = {styles.gradient} >
-        </LinearGradient>
-  </View>
-    );
+        );
+    }
+    
   }
 }
 const styles = StyleSheet.create({
