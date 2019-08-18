@@ -5,10 +5,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather, Entypo,MaterialCommunityIcons } from "@expo/vector-icons";
 import Temperature from '../components/Temperature';
 import WeatherDescription from '../components/WeatherDescription';
 import Place from '../components/Place';
+import DetailsWeather from '../components/DetailsWeather';
 import {getWeather} from '../utils';
 
 
@@ -24,7 +25,10 @@ export default class MainScreen extends Component {
         icon: '',
         weatherMain: '',
         placeName : '',
-        time: ''
+        time: '',
+        wind: '',
+        humidity :'',
+        pressure: ''
     };
   }
   getLocationAsync = async() =>{
@@ -40,6 +44,10 @@ export default class MainScreen extends Component {
         const weatherMain = await curWeather.weather[0].main;
         const placeName = await curWeather.name;
         const time = await curWeather.dt;
+        const wind = await curWeather.wind.speed;
+        const humidity = await curWeather.main.humidity;
+        const pressure = await curWeather.main.pressure;
+
         this.setState({
             temperatureC,
             description,
@@ -47,14 +55,20 @@ export default class MainScreen extends Component {
             weatherMain,
             placeName,
             time,
+            wind,
+            humidity,
+            pressure,
             loading : false
         })
   }
-  componentDidMount =  async () =>{
-        await this.getLocationAsync();
+  componentDidMount =  () =>{
+      //get API every min
+    this.getLocationAsync();
+    this.timer = setInterval(()=> this.getLocationAsync(), 60000)
   }
 
   render() {
+      // 
       if(this.state.loading){
           return (
               <ActivityIndicator size = 'large' style = {{flex: 1}} />
@@ -81,11 +95,44 @@ export default class MainScreen extends Component {
                             time = {this.state.time} >
                         </Place>  
                     </View>
-                    <View style={styles.empty} ></View>
-                    
+                    <View style={styles.detailWeather} >
+                        <View style = {styles.containerDetail}>  
+                            <Feather
+                                name = 'wind'
+                                size = {25} />
+                            <Text>
+                                Wind
+                            </Text>
+                            <Text>
+                                {this.state.wind} m/s
+                            </Text>
+                        </View>
+                        <View style = {styles.containerDetail}>  
+                            <Entypo
+                                name = 'water'
+                                size = {25} />
+                            <Text>
+                                Humidity
+                            </Text>
+                            <Text>
+                                {this.state.humidity} %
+                            </Text>
+                        </View> 
+                        <View style = {styles.containerDetail}>  
+                            <MaterialCommunityIcons
+                                name = 'speedometer'
+                                size = {25} />
+                            <Text>
+                                Pressure
+                            </Text>
+                            <Text>
+                                {this.state.pressure} hPa
+                            </Text>
+                        </View>      
+                    </View>
                 </View>
                 <LinearGradient
-                    colors={['rgba(0,0,0,0.8)', 'transparent']}
+                    colors={['rgba(0,0,0,0.2)', 'transparent']}
                     style = {styles.gradient} >
                 </LinearGradient>
             </View>
@@ -100,7 +147,7 @@ const styles = StyleSheet.create({
     },
     content:{
         flex: 1,
-        backgroundColor: 'yellow',
+        backgroundColor: 'white',
         flexDirection: "column",
         justifyContent: "space-around"
         
@@ -120,10 +167,24 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
     },
     place:{
-        flex : 0.3
+        flex : 0.2
     },
     empty:{
         flex: 0.1
+    },
+    detailWeather:{
+        flex: 0.2,
+        flexDirection: 'row',
+        justifyContent: "space-around",
+        alignItems: "flex-start"
+    },
+    containerDetail:{
+        borderWidth: 1,
+        borderRadius: 5,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 5
     }
     
 });
