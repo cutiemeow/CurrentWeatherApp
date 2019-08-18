@@ -10,7 +10,8 @@ import Temperature from '../components/Temperature';
 import WeatherDescription from '../components/WeatherDescription';
 import Place from '../components/Place';
 import DetailsWeather from '../components/DetailsWeather';
-import {getWeather} from '../utils';
+import {getWeather,getBackground} from '../utils';
+import {imagePhoto} from '../img';
 
 
 
@@ -28,7 +29,8 @@ export default class MainScreen extends Component {
         time: '',
         wind: '',
         humidity :'',
-        pressure: ''
+        pressure: '',
+        background : ''
     };
   }
   getLocationAsync = async() =>{
@@ -47,7 +49,7 @@ export default class MainScreen extends Component {
         const wind = await curWeather.wind.speed;
         const humidity = await curWeather.main.humidity;
         const pressure = await curWeather.main.pressure;
-
+        const background = await getBackground(weatherMain);
         this.setState({
             temperatureC,
             description,
@@ -58,6 +60,7 @@ export default class MainScreen extends Component {
             wind,
             humidity,
             pressure,
+            background,
             loading : false
         })
   }
@@ -76,66 +79,64 @@ export default class MainScreen extends Component {
       }
       else{
         return (
-            <View style={styles.container}>
-                <View style={styles.content}>
-                <View style={styles.empty} ></View>
-                    <View style = {styles.weather} >
-                        <WeatherDescription
-                            weatherDescription = {this.state.description}
-                            weatherIcon = {this.state.icon}
-                            weatherMain = {this.state.weatherMain} >
-                        </WeatherDescription>
-                        <Temperature
-                            temperature = {this.state.temperatureC} >
-                        </Temperature>
-                    </View>
-                    <View style = {styles.place} >
-                        <Place
-                            placeName = {this.state.placeName}
-                            time = {this.state.time} >
-                        </Place>  
-                    </View>
-                    <View style={styles.detailWeather} >
-                        <View style = {styles.containerDetail}>  
-                            <Feather
-                                name = 'wind'
-                                size = {25} />
-                            <Text>
-                                Wind
-                            </Text>
-                            <Text>
-                                {this.state.wind} m/s
-                            </Text>
-                        </View>
-                        <View style = {styles.containerDetail}>  
-                            <Entypo
-                                name = 'water'
-                                size = {25} />
-                            <Text>
-                                Humidity
-                            </Text>
-                            <Text>
-                                {this.state.humidity} %
-                            </Text>
-                        </View> 
-                        <View style = {styles.containerDetail}>  
-                            <MaterialCommunityIcons
-                                name = 'speedometer'
-                                size = {25} />
-                            <Text>
-                                Pressure
-                            </Text>
-                            <Text>
-                                {this.state.pressure} hPa
-                            </Text>
-                        </View>      
-                    </View>
-                </View>
-                <LinearGradient
-                    colors={['rgba(0,0,0,0.2)', 'transparent']}
-                    style = {styles.gradient} >
-                </LinearGradient>
-            </View>
+            <ImageBackground
+                source = {{uri:this.state.background[0].url}}
+                style={styles.content}
+                imageStyle = {{opacity: 0.5}} >
+                            <View style={styles.empty} ></View>
+                            <View style = {styles.weather} >
+                                <WeatherDescription
+                                    weatherDescription = {this.state.description}
+                                    weatherIcon = {this.state.icon}
+                                    weatherMain = {this.state.weatherMain} >
+                                </WeatherDescription>
+                                <Temperature
+                                    temperature = {this.state.temperatureC} >
+                                </Temperature>
+                            </View>
+                            <View style = {styles.place} >
+                                <Place
+                                    placeName = {this.state.placeName}
+                                    time = {this.state.time} >
+                                </Place>  
+                            </View>
+                            <View style={styles.detailWeather} >
+                                <View style = {styles.containerDetail}>  
+                                    <Feather
+                                        name = 'wind'
+                                        size = {25} />
+                                    <Text>
+                                        Wind
+                                    </Text>
+                                    <Text>
+                                        {this.state.wind} m/s
+                                    </Text>
+                                </View>
+                                <View style = {styles.containerDetail}>  
+                                    <Entypo
+                                        name = 'water'
+                                        size = {25} />
+                                    <Text>
+                                        Humidity
+                                    </Text>
+                                    <Text>
+                                        {this.state.humidity} %
+                                    </Text>
+                                </View> 
+                                <View style = {styles.containerDetail}>  
+                                    <MaterialCommunityIcons
+                                        name = 'speedometer'
+                                        size = {25} />
+                                    <Text>
+                                        Pressure
+                                    </Text>
+                                    <Text>
+                                        {this.state.pressure} hPa
+                                    </Text>
+                                </View>      
+                            </View>
+            </ImageBackground>
+            
         );
     }
     
@@ -149,8 +150,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
         flexDirection: "column",
-        justifyContent: "space-around"
-        
+        justifyContent: "space-around",
         
     },
     
